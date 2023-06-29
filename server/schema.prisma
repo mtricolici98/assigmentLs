@@ -1,8 +1,33 @@
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Column {
+  id         Int    @id @default(autoincrement())
+  name       String
+  // CSV Of sorting order for the items
+  itemsOrder String
+  Items      Item[]
+}
+
+model Item {
+  id       Int       @id @default(autoincrement())
+  title    String
+  column   Column    @relation(fields: [columnId], references: [id], onDelete: Restrict)
+  columnId Int
+  deadline DateTime?
+  Images   Image[]
+  done     Boolean   @default(false)
+}
+
+model Image {
+  id         Int  @id @default(autoincrement())
+  base64data Json
+  item       Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId     Int
 }

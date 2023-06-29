@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as types from './graphql';
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import {TypedDocumentNode as DocumentNode} from '@graphql-typed-document-node/core';
 
 /**
  * Map of all GraphQL operations in the project.
@@ -41,7 +41,7 @@ export function graphql(source: "\n    query Kanban {\n        kanban {\n       
 export function graphql(source: "\n    mutation MoveItem($itemId: ID!, $toListId: ID!, $index: Int!) {\n        moveItem(itemId: $itemId, toListId: $toListId, index: $index) {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n"): (typeof documents)["\n    mutation MoveItem($itemId: ID!, $toListId: ID!, $index: Int!) {\n        moveItem(itemId: $itemId, toListId: $toListId, index: $index) {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n"];
 
 export function graphql(source: string) {
-  return (documents as any)[source] ?? {};
+    return (documents as any)[source] ?? {};
 }
 
-export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;
+export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<infer TType, any> ? TType : never;

@@ -8,7 +8,11 @@
     "generate-prisma-client": "prisma generate",
     "start-services": "docker-compose up -d",
     "stop-services": "docker-compose down",
-    "prisma": "prisma"
+    "prisma": "prisma",
+    "seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node seed.ts"
   },
   "devDependencies": {
     "@types/node": "^20.3.2",
