@@ -3,7 +3,7 @@ import {DragDropContext, Droppable, DropResult, ResponderProvided} from 'react-b
 import request from 'graphql-request'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {graphql} from './gql'
-import {useCallback} from "react";
+import {useCallback, useState} from "react";
 import {DraggableKanbanList} from "./components/DraggableKanbanList";
 import {KanbanQuery} from "./gql/graphql";
 
@@ -108,8 +108,9 @@ export function Kanban() {
         if (result.type === 'item' || (result.type === 'column' && result.destination.droppableId === 'kanban')) {
             const boardId = Number(result.destination.droppableId)
             let afterItemId = -1;
+            const localData = client.getQueryData<KanbanQuery>(['board']);
             if (result.destination.index >= 0) {
-                const destinationBoard = data?.board.find((el) => el.id == boardId);
+                const destinationBoard = localData?.board.find((el) => el.id == boardId);
                 if (!destinationBoard) {
                     return;
                 }

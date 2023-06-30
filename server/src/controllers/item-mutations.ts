@@ -1,5 +1,6 @@
 import prisma from "../db";
 import {Column, Item} from "@prisma/client";
+import logger from "../utils/logging";
 
 class columnMutations {
 
@@ -10,18 +11,26 @@ class columnMutations {
         const itemsOrder = column.itemsOrder.split('|').filter((el) => el).map(
             (el) => Number(el)
         )
+        logger.info(`Old items are ${itemsOrder}`, )
         let indexAfter = 0
         if (afterItemId != -1) {
             indexAfter = itemsOrder.indexOf(afterItemId)
         }
-        itemsOrder.splice(indexAfter, 0, item.id)
+        if (!itemsOrder.length) {
+            // Could be that the order is empty
+            itemsOrder.push(item.id)
+        } else {
+            itemsOrder.splice(indexAfter, 0, item.id)
+        }
+        const newItemsOrder = itemsOrder.map(el => el.toString()).join('|')
+        logger.info(`New items are ${newItemsOrder}`)
         await prisma.column.update(
             {
                 where: {
                     id: column.id
                 },
                 data: {
-                    itemsOrder: itemsOrder.map(el => el.toString()).join('|')
+                    itemsOrder: newItemsOrder
                 }
             }
         )
@@ -60,6 +69,7 @@ class columnMutations {
         if (!columnTo) {
             throw new Error('Destination column not found')
         }
+        logger.info(`Moving ${itemToMove.id} to ${columnTo.id}`)
         if (itemToMove.columnId !== columnTo.id) {
             // Updating FK ref
             prisma.item.update(
@@ -73,7 +83,7 @@ class columnMutations {
                 }
             )
         }
-        await this.calculateNewOrder(columnTo, itemToMove, afterItemId);
+        await columnMutations.calculateNewOrder(columnTo, itemToMove, afterItemId);
         return prisma.column.findMany(
             {
                 include: {
