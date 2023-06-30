@@ -3,7 +3,7 @@ import {Column, Item} from "@prisma/client";
 
 class columnMutations {
 
-    private static async calculateNewOrder(column: Column, item: Item, afterItemId: number | null) {
+    private static async calculateNewOrder(column: Column, item: Item, afterItemId: number) {
         /*
         * We allow null for afterItemId just in case it's the first in the list
         * */
@@ -11,7 +11,7 @@ class columnMutations {
             (el) => Number(el)
         )
         let indexAfter = 0
-        if (afterItemId) {
+        if (afterItemId != -1) {
             indexAfter = itemsOrder.indexOf(afterItemId)
         }
         itemsOrder.splice(indexAfter, 0, item.id)
@@ -27,14 +27,16 @@ class columnMutations {
         )
     }
 
-    static async moveItem({itemId, toListId, afterItemId}: {
+    static async moveItem({itemId, toListId, afterItemId, doneIncluded}: {
         itemId: number,
         toListId: number,
-        afterItemId: number | null
+        afterItemId: number,
+        doneIncluded: boolean
     }) {
         /*
          * afterItemid could be null in case it's the first item in the list, thus we set it as first
          */
+
         const itemToMove = await prisma.item.findUnique(
             {
                 where: {
@@ -58,50 +60,29 @@ class columnMutations {
         if (!columnTo) {
             throw new Error('Destination column not found')
         }
-        // Updating FK ref
-        prisma.item.update(
-            {
-                where: {
-                    id: itemToMove.id
-                },
-                data: {
-                    columnId: columnTo.id
+        if (itemToMove.columnId !== columnTo.id) {
+            // Updating FK ref
+            prisma.item.update(
+                {
+                    where: {
+                        id: itemToMove.id
+                    },
+                    data: {
+                        columnId: columnTo.id
+                    }
                 }
-            }
-        )
+            )
+        }
         await this.calculateNewOrder(columnTo, itemToMove, afterItemId);
         return prisma.column.findMany(
             {
                 include: {
-                    Items: true
-                }
-            }
-        )
-    }
-
-    static async reOrderItem({itemId, afterItemId}: { itemId: number, afterItemId: number }) {
-        const item = await prisma.item.findUnique(
-            {
-                where: {
-                    id: itemId
-                },
-                include: {
-                    column: true
-                }
-            }
-        )
-        if (!item) {
-            throw new Error('Item not found')
-        }
-        const column = await item?.column
-        if (!column) {
-            throw new Error('Item with no column ?!')
-        }
-        await this.calculateNewOrder(column, item, afterItemId)
-        return prisma.column.findMany(
-            {
-                include: {
-                    Items: true
+                    Items: {
+                        where: doneIncluded ? undefined : {done: false},
+                        include: {
+                            Images: true
+                        }
+                    }
                 }
             }
         )
@@ -111,7 +92,6 @@ class columnMutations {
 
 const itemMutations = {
     moveItem: columnMutations.moveItem,
-    reOrderItem: columnMutations.reOrderItem,
 }
 
 export default itemMutations;

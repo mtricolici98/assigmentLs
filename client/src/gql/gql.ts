@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as types from './graphql';
-import {TypedDocumentNode as DocumentNode} from '@graphql-typed-document-node/core';
+import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 
 /**
  * Map of all GraphQL operations in the project.
@@ -13,8 +13,8 @@ import {TypedDocumentNode as DocumentNode} from '@graphql-typed-document-node/co
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n    query Kanban {\n        kanban {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n": types.KanbanDocument,
-    "\n    mutation MoveItem($itemId: ID!, $toListId: ID!, $index: Int!) {\n        moveItem(itemId: $itemId, toListId: $toListId, index: $index) {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n": types.MoveItemDocument,
+    "\n    query Kanban {\n        board {\n            id\n            name\n            itemsOrder\n            Items {\n                id\n                title\n                done\n                Images {\n                base64data\n                }\n            }\n        }\n    }\n": types.KanbanDocument,
+    "\n    mutation MoveItem($itemId: Int!, $toListId: Int!, $afterItemId: Int!, $doneIncluded: Boolean!) {\n        moveItem(itemId: $itemId, toListId: $toListId, afterItemId: $afterItemId, doneIncluded: $doneIncluded) {\n            id\n            name\n            itemsOrder\n            Items {\n                id\n                title\n                done\n                Images {\n                base64data\n                }\n            }\n        }\n    }\n": types.MoveItemDocument,
 };
 
 /**
@@ -34,14 +34,14 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n    query Kanban {\n        kanban {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n"): (typeof documents)["\n    query Kanban {\n        kanban {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n"];
+export function graphql(source: "\n    query Kanban {\n        board {\n            id\n            name\n            itemsOrder\n            Items {\n                id\n                title\n                done\n                Images {\n                base64data\n                }\n            }\n        }\n    }\n"): (typeof documents)["\n    query Kanban {\n        board {\n            id\n            name\n            itemsOrder\n            Items {\n                id\n                title\n                done\n                Images {\n                base64data\n                }\n            }\n        }\n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n    mutation MoveItem($itemId: ID!, $toListId: ID!, $index: Int!) {\n        moveItem(itemId: $itemId, toListId: $toListId, index: $index) {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n"): (typeof documents)["\n    mutation MoveItem($itemId: ID!, $toListId: ID!, $index: Int!) {\n        moveItem(itemId: $itemId, toListId: $toListId, index: $index) {\n            id\n            name\n            items {\n                id\n                name\n                done\n            }\n        }\n    }\n"];
+export function graphql(source: "\n    mutation MoveItem($itemId: Int!, $toListId: Int!, $afterItemId: Int!, $doneIncluded: Boolean!) {\n        moveItem(itemId: $itemId, toListId: $toListId, afterItemId: $afterItemId, doneIncluded: $doneIncluded) {\n            id\n            name\n            itemsOrder\n            Items {\n                id\n                title\n                done\n                Images {\n                base64data\n                }\n            }\n        }\n    }\n"): (typeof documents)["\n    mutation MoveItem($itemId: Int!, $toListId: Int!, $afterItemId: Int!, $doneIncluded: Boolean!) {\n        moveItem(itemId: $itemId, toListId: $toListId, afterItemId: $afterItemId, doneIncluded: $doneIncluded) {\n            id\n            name\n            itemsOrder\n            Items {\n                id\n                title\n                done\n                Images {\n                base64data\n                }\n            }\n        }\n    }\n"];
 
 export function graphql(source: string) {
-    return (documents as any)[source] ?? {};
+  return (documents as any)[source] ?? {};
 }
 
-export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<infer TType, any> ? TType : never;
+export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;

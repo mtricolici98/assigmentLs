@@ -6,14 +6,14 @@ import {DraggableKanbanItem} from "./DraggableKanbanItem";
 export function DraggableKanbanList({
                                         index,
                                         title, items, id
-                                    }: { title: string, id: string, items: { id: string, name: string, done: boolean }[], index: any }) {
-    return <Draggable draggableId={id} index={index}>
+                                    }: { title: string, id: number, items: { id: number, title: string, done: boolean }[], index: any }) {
+    return <Draggable draggableId={id.toString()} index={index}>
         {(provided) => (
             <KanbanList
                 title={title}
                 {...provided.draggableProps} {...provided.dragHandleProps}
                 ref={provided.innerRef}>
-                <Droppable droppableId={id}
+                <Droppable droppableId={id.toString()}
                            direction={'vertical'} type={'item'}>
                     {(provided) => (
                         <Stack spacing={2} ref={provided.innerRef}

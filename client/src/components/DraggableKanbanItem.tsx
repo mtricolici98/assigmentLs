@@ -3,14 +3,14 @@ import {KanbanItem} from "./KanbanItem";
 
 export function DraggableKanbanItem({
                                         index,
-                                        item: {id, name}
-                                    }: { item: { id: string; name: string; done: boolean }, index: number }) {
-    return <Draggable draggableId={id}
+                                        item: {id, title}
+                                    }: { item: { id: number; title: string; done: boolean }, index: number }) {
+    return <Draggable draggableId={id.toString()}
                       index={index}
     >
         {(provided) => (
             <KanbanItem {...provided.draggableProps} {...provided.dragHandleProps}
-                        title={name}
+                        title={title}
                         ref={provided.innerRef}/>
         )}
     </Draggable>;

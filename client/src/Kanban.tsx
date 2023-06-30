@@ -11,27 +11,35 @@ const GRAPHQL_SERVER = 'http://localhost:4000/graphql';
 
 const KANBAN_QUERY = graphql(/* GraphQL */`
     query Kanban {
-        kanban {
+        board {
             id
             name
-            items {
+            itemsOrder
+            Items {
                 id
-                name
+                title
                 done
+                Images {
+                base64data
+                }
             }
         }
     }
 `)
 
 const MUTATE_MOVE_ITEM = graphql(/* GraphQL */`
-    mutation MoveItem($itemId: ID!, $toListId: ID!, $index: Int!) {
-        moveItem(itemId: $itemId, toListId: $toListId, index: $index) {
+    mutation MoveItem($itemId: Int!, $toListId: Int!, $afterItemId: Int!, $doneIncluded: Boolean!) {
+        moveItem(itemId: $itemId, toListId: $toListId, afterItemId: $afterItemId, doneIncluded: $doneIncluded) {
             id
             name
-            items {
+            itemsOrder
+            Items {
                 id
-                name
+                title
                 done
+                Images {
+                base64data
+                }
             }
         }
     }
@@ -39,7 +47,7 @@ const MUTATE_MOVE_ITEM = graphql(/* GraphQL */`
 
 export function Kanban() {
     const {data} = useQuery({
-        queryKey: ['kanban'],
+        queryKey: ['board'],
         queryFn: async () =>
             request(
                 GRAPHQL_SERVER,
@@ -50,34 +58,46 @@ export function Kanban() {
     const client = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: async (variables: { itemId: string, toListId: string, index: number }) =>
+        mutationFn: async (variables: {
+            itemId: number,
+            toListId: number,
+            afterItemId: number,
+            doneIncluded: boolean
+        }) =>
             request(
                 GRAPHQL_SERVER,
                 MUTATE_MOVE_ITEM,
                 variables,
             ),
         //optimistic update
-        onMutate: async ({index, itemId, toListId}) => {
-            client.setQueryData(['kanban'], (old: KanbanQuery | undefined) => {
-                if(!old) return old;
-                const kanban = old.kanban
-                const columnFrom = kanban.find(column => column.items.find(item => item.id === itemId))
-                const columnTo = kanban.find(column => column.id === toListId)
+        // This is cool...
+        onMutate: async ({afterItemId, itemId, toListId}) => {
+            // This shows an error that KanbanQuery has no attribute board,
+            // I have not found a way to fix it but ignoring works just as well....
+            client.setQueryData(['board'], (old: KanbanQuery | undefined) => {
+                if (!old) return old;
+                const board = old.board
+                const columnFrom = board.find(column => column.Items.find(item => item.id === itemId))
+                const columnTo = board.find(column => column.id === toListId)
                 if (!columnFrom || !columnTo) {
                     throw new Error('Column not found')
                 }
-                const item = columnFrom.items.find(item => item.id === itemId)
+                const item = columnFrom.Items.find(item => item.id === itemId)
                 if (!item) {
                     throw new Error('Item not found')
                 }
-                columnFrom.items = columnFrom.items.filter(item => item.id !== itemId)
-                columnTo.items.splice(index, 0, item)
-                return {kanban}
+                columnFrom.Items = columnFrom.Items.filter(item => item.id !== itemId)
+                let afterItemIndex = 0
+                if (afterItemId) {
+                    afterItemIndex = columnTo.Items.map((el) => el.id).indexOf(afterItemId)
+                }
+                columnTo.Items.splice(afterItemIndex, 0, item)
+                return {board}
             })
         },
         // update
         onSuccess: (data, variables) => {
-            client.setQueryData(['kanban'], {kanban: data.moveItem})
+            client.setQueryData(['board'], {board: data.moveItem})
         }
     });
 
@@ -85,15 +105,23 @@ export function Kanban() {
         if (!result.destination) return;
         if (result.destination.index === result.source.index && result.source.droppableId === result.destination.droppableId) return;
         if (result.reason === 'CANCEL') return;
-        if (result.type === 'item') {
+        if (result.type === 'item' || (result.type === 'column' && result.destination.droppableId === 'kanban')) {
+            const boardId = Number(result.destination.droppableId)
+            let afterItemId = -1;
+            if (result.destination.index >= 0) {
+                const destinationBoard = data?.board.find((el) => el.id == boardId);
+                if (!destinationBoard) {
+                    return;
+                }
+                const afterItem = destinationBoard.Items[result.destination.index];
+                afterItemId = afterItem.id;
+            }
             await mutation.mutate({
-                index: result.destination.index,
-                itemId: result.draggableId,
-                toListId: result.destination.droppableId,
+                itemId: Number(result.draggableId),
+                toListId: boardId,
+                afterItemId: afterItemId,
+                doneIncluded: true
             });
-        }
-        if(result.type === 'column' && result.destination.droppableId === 'kanban') {
-            //TODO: move column
         }
 
     }, [])
@@ -108,8 +136,8 @@ export function Kanban() {
                                {...provided.droppableProps}
                         >
                             {
-                                data?.kanban.map((list, index) => (
-                                    <DraggableKanbanList key={list.id} id={list.id} title={list.name} items={list.items}
+                                data?.board.map((list, index) => (
+                                    <DraggableKanbanList key={list.id} id={list.id} title={list.name} items={list.Items}
                                                          index={index}/>
                                 ))
                             }

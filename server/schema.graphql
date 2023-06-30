@@ -1,19 +1,26 @@
 type Query {
-    kanban: [KanbanColumn!]!
+    board: [KanbanColumn!]!
 }
 
 type Mutation {
-    moveItem(itemId: ID!, toListId: ID!, index: Int!): [KanbanColumn!]!
+    moveItem(itemId: Int!, toListId: Int!, afterItemId: Int!, doneIncluded: Boolean!): [KanbanColumn!]!
 }
 
 type KanbanColumn {
-    id: ID!
+    id: Int!
     name: String!
-    items: [KanbanItem!]!
+    Items: [KanbanItem!]!
+    itemsOrder: String!
 }
 
 type KanbanItem {
-    id: ID!
-    name: String!
+    id: Int!
+    title: String!
     done: Boolean!
+    Images: [ItemImage!]
+}
+
+type ItemImage {
+    id: Int!
+    base64data: String!
 }
