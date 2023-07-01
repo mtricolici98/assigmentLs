@@ -1,21 +1,23 @@
 import prisma from "../db";
 import {Column, Item} from "@prisma/client";
 import logger from "../utils/logging";
+import boardQueries from "./board-queries";
 
-class columnMutations {
+class ItemMutations {
 
     private static async calculateNewOrder(column: Column, item: Item, afterItemId: number) {
         /*
         * We allow null for afterItemId just in case it's the first in the list
         * */
-        const itemsOrder = column.itemsOrder.split('|').filter((el) => el).map(
+        let itemsOrder = column.itemsOrder.split('|').filter((el) => el).map(
             (el) => Number(el)
         )
-        logger.info(`Old items are ${itemsOrder}`, )
+        logger.info(`Old items are ${itemsOrder}`,)
         let indexAfter = 0
         if (afterItemId != -1) {
-            indexAfter = itemsOrder.indexOf(afterItemId)
+            indexAfter = itemsOrder.indexOf(afterItemId) + 1
         }
+        itemsOrder = itemsOrder.filter((id) => id != item.id)
         if (!itemsOrder.length) {
             // Could be that the order is empty
             itemsOrder.push(item.id)
@@ -72,7 +74,7 @@ class columnMutations {
         logger.info(`Moving ${itemToMove.id} to ${columnTo.id}`)
         if (itemToMove.columnId !== columnTo.id) {
             // Updating FK ref
-            prisma.item.update(
+            await prisma.item.update(
                 {
                     where: {
                         id: itemToMove.id
@@ -83,25 +85,14 @@ class columnMutations {
                 }
             )
         }
-        await columnMutations.calculateNewOrder(columnTo, itemToMove, afterItemId);
-        return prisma.column.findMany(
-            {
-                include: {
-                    Items: {
-                        where: doneIncluded ? undefined : {done: false},
-                        include: {
-                            Images: true
-                        }
-                    }
-                }
-            }
-        )
+        await ItemMutations.calculateNewOrder(columnTo, itemToMove, afterItemId);
+        return boardQueries.boards({includeDone: doneIncluded})
     }
 
 }
 
 const itemMutations = {
-    moveItem: columnMutations.moveItem,
+    moveItem: ItemMutations.moveItem,
 }
 
 export default itemMutations;

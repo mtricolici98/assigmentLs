@@ -7,12 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Board {
+  id           Int      @id @default(autoincrement())
+  columns      Column[]
+  columnsOrder String   @default("")
+}
+
 model Column {
   id         Int    @id @default(autoincrement())
   name       String
   // CSV Of sorting order for the items
   itemsOrder String
-  Items      Item[]
+  items      Item[]
+  board      Board  @relation(fields: [boardId], references: [id])
+  boardId    Int
 }
 
 model Item {
@@ -21,7 +29,7 @@ model Item {
   column   Column    @relation(fields: [columnId], references: [id], onDelete: Restrict)
   columnId Int
   deadline DateTime?
-  Images   Image[]
+  images   Image[]
   done     Boolean   @default(false)
 }
 

@@ -6,13 +6,15 @@ import cors from 'cors'
 import boardQueries from "./controllers/board-queries";
 import itemMutations from "./controllers/item-mutations";
 import itemUpdates from "./controllers/item-updates";
+import columnsMutations from "./controllers/column-mutations";
 
 const schema = buildSchema(readFileSync('./schema.graphql', 'utf-8'))
 
 const root = {
     ...boardQueries,
     ...itemMutations,
-    ...itemUpdates
+    ...itemUpdates,
+    ...columnsMutations
 }
 
 const app = express()

@@ -1,28 +1,43 @@
 import prisma from "../db";
-import {it} from "node:test";
 
 class BoardQueries {
-    static async board({includeDone}: { includeDone: boolean }) {
-        return prisma.column.findMany(
+    static async boards({includeDone}: { includeDone: boolean }) {
+        const boards = await prisma.board.findMany(
             {
                 include: {
-                    Items: {
-                        // Querying only not-done items by default
-                        // Hope undefined works as intended...
-                        where: includeDone ? undefined : {done: false},
+                    columns: {
                         include: {
-                            Images: true
+                            items: {
+                                where: includeDone ? undefined : {done: false},
+                                include: {
+                                    images: true
+                                }
+                            }
                         }
                     }
                 }
             }
         )
+        for (const board of boards) {
+            for (const column of board.columns) {
+                column.items.sort(
+                    (a, b) => column.itemsOrder.indexOf(
+                        a.id.toString()) - column.itemsOrder.indexOf(b.id.toString()
+                    )
+                )
+            }
+            board.columns.sort(
+                (a, b) =>
+                    board.columnsOrder.indexOf(a.id.toString()) - board.columnsOrder.indexOf(b.id.toString())
+            )
+        }
+        return boards
     }
 }
 
 
 const boardQueries: any = {
-    board: BoardQueries.board
+    boards: BoardQueries.boards
 };
 
 export default boardQueries;

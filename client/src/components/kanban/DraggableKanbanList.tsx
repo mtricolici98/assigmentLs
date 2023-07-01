@@ -2,12 +2,34 @@ import {Draggable, Droppable} from "react-beautiful-dnd";
 import {KanbanList} from "./KanbanList";
 import {Button, Stack} from "@mui/material";
 import {DraggableKanbanItem} from "./DraggableKanbanItem";
+import {AddItemComponent} from "../reusables/AddItemComponent";
+import {useItemAddMutations} from "../../mutations/ItemMutations";
+import {useQueryClient} from "@tanstack/react-query";
 
 export function DraggableKanbanList({
                                         index,
                                         title, items, id
-                                    }: { title: string, id: number, items: { id: number, title: string, done: boolean }[], index: any }) {
-    return <Draggable draggableId={id.toString()} index={index}>
+                                    }: {
+    title: string,
+    id: number,
+    items: {
+        id: number,
+        title: string,
+        done: boolean,
+        images?: any[] | null
+    }[],
+    index: any
+}) {
+    const queryClient = useQueryClient()
+    const addMutations = useItemAddMutations(queryClient);
+
+    const onItemConfirmed = (text: string) => {
+        addMutations.mutate(
+            {title: text, columnId: id}
+        )
+    }
+
+    return <Draggable draggableId={"list." + id.toString()} index={index}>
         {(provided) => (
             <KanbanList
                 title={title}
@@ -27,7 +49,7 @@ export function DraggableKanbanList({
                         </Stack>
                     )}
                 </Droppable>
-                <Button>Add item</Button>
+                <AddItemComponent label={'Add Item'} onTextChange={onItemConfirmed}/>
             </KanbanList>
         )}
     </Draggable>;

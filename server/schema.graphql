@@ -1,15 +1,28 @@
 type Query {
-    board: [KanbanColumn!]!
+    boards: [KanbanBoard!]!
 }
 
 type Mutation {
-    moveItem(itemId: Int!, toListId: Int!, afterItemId: Int!, doneIncluded: Boolean!): [KanbanColumn!]!
+    moveItem(itemId: Int!, toListId: Int!, afterItemId: Int!, doneIncluded: Boolean!): [KanbanBoard!]!
+    moveColumn(columnId: Int!, afterColumnId: Int!, doneIncluded: Boolean!): [KanbanBoard!]!
+    # We return full board on add (just in case there's other changes, such as ordering)
+    createItem(title: String!, columnId: Int!): [KanbanBoard!]!
+    updateItem(itemId: Int!, newTitle: String!): KanbanItem!
+    setDone(itemId: Int!, done: Boolean!): KanbanItem!
+    # Return the column we removed from
+    deleteItem(itemId: Int!): KanbanColumn
+}
+
+type KanbanBoard {
+    id: Int!
+    columns: [KanbanColumn!]!
+    columnsOrder: String!
 }
 
 type KanbanColumn {
     id: Int!
     name: String!
-    Items: [KanbanItem!]!
+    items: [KanbanItem!]!
     itemsOrder: String!
 }
 
@@ -17,10 +30,12 @@ type KanbanItem {
     id: Int!
     title: String!
     done: Boolean!
-    Images: [ItemImage!]
+    columnId: String
+    images: [ItemImage!]
 }
 
 type ItemImage {
     id: Int!
     base64data: String!
 }
+
