@@ -5,11 +5,9 @@ type Query {
 type Mutation {
     moveItem(itemId: Int!, toListId: Int!, afterItemId: Int!, doneIncluded: Boolean!): [KanbanBoard!]!
     moveColumn(columnId: Int!, afterColumnId: Int!, doneIncluded: Boolean!): [KanbanBoard!]!
-    # We return full board on add (just in case there's other changes, such as ordering)
     createItem(title: String!, columnId: Int!): [KanbanBoard!]!
     updateItem(itemId: Int!, newTitle: String!): KanbanItem!
-    setDone(itemId: Int!, done: Boolean!): KanbanItem!
-    # Return the column we removed from
+    setDone(itemId: Int!, done: Boolean!): [KanbanBoard!]!
     deleteItem(itemId: Int!): KanbanColumn
 }
 

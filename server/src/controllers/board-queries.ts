@@ -1,6 +1,6 @@
 import prisma from "../db";
 
-class BoardQueries {
+export class BoardQueries {
     static async boards({includeDone}: { includeDone: boolean }) {
         const boards = await prisma.board.findMany(
             {

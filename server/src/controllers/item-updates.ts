@@ -26,7 +26,7 @@ class ItemUpdates {
         await prisma.column.update(
             {where: {id: columnId}, data: {itemsOrder: oldOrder.join('|')}}
         )
-        return BoardQueries.boards()
+        return BoardQueries.boards({includeDone: false})
 
     }
 
@@ -49,7 +49,7 @@ class ItemUpdates {
     }
 
     static async setDone({itemId, done}: { itemId: number, done: boolean }) {
-        return prisma.item.update(
+        await prisma.item.update(
             {
                 where: {
                     id: itemId,
@@ -62,6 +62,7 @@ class ItemUpdates {
                 }
             }
         )
+        return BoardQueries.boards({includeDone: false})
     }
 
     static async deleteItem({itemId}: { itemId: number }) {

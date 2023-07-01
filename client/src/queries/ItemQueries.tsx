@@ -46,11 +46,20 @@ export const MUTATE_DONE_ITEM = graphql(/* GraphQL */`
     mutation setDone($itemId: Int! $done: Boolean!) {
         setDone(itemId: $itemId, done: $done) {
             id
-            title
-            done
-            images {
+            columnsOrder
+            columns {
                 id
-                base64data
+                name
+                itemsOrder
+                items {
+                    id
+                    title
+                    done
+                    images {
+                        id
+                        base64data
+                    }
+                }
             }
         }
     }

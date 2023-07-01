@@ -13,7 +13,8 @@ export const KanbanItem = forwardRef(function ({
 } & CardProps, ref: any) {
 
     const updateItemMutation = useItemUpdateMutations();
-    const doneItemMutation = useItemDoneMutation();
+    const queryClient = useQueryClient()
+    const doneItemMutation = useItemDoneMutation(queryClient);
     const onTextChanged = (newText: string) => {
         item.title = newText;
         updateItemMutation.mutate(

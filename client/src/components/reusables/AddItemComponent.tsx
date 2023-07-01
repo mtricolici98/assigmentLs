@@ -22,10 +22,12 @@ export const AddItemComponent =
                                if (event.key === 'Enter') {
                                    onTextChange(text)
                                    setEdit(false)
+                                   setText('')
                                }
                                if (event.key === 'Escape') {
                                    setText(text);
                                    setEdit(false)
+                                   setText('')
                                }
                            }}
                            value={text}

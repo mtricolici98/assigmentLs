@@ -2,7 +2,7 @@ import {QueryClient, useMutation} from "@tanstack/react-query";
 import {GRAPHQL_SERVER} from "../constants";
 import {MUTATE_MOVE_ITEM} from "../queries/BoardQueries";
 import {KanbanItem, KanbanQuery} from "../gql/graphql";
-import {getBoardByColumnId} from "../utils/BoardUtils";
+import {getBoardByColumnId, getBoardByItemId} from "../utils/BoardUtils";
 import {MUTATE_ADD_ITEM, MUTATE_DONE_ITEM, MUTATE_UPDATE_ITEM} from "../queries/ItemQueries";
 import request from "graphql-request";
 
@@ -26,7 +26,7 @@ export function useItemUpdateMutations() {
     });
 }
 
-export function useItemDoneMutation() {
+export function useItemDoneMutation(client: QueryClient) {
     return useMutation({
         mutationFn: async (variables: {
             itemId: number,
@@ -38,12 +38,29 @@ export function useItemDoneMutation() {
                 MUTATE_DONE_ITEM,
                 variables,
             ),
-        onMutate: (variables) => {
-            variables.instance.done = variables.done
+        onMutate: ({itemId, done}) => {
+            client.setQueryData(['boards'], (old: KanbanQuery | undefined) => {
+                if (!old) return old;
+                const boards = old.boards
+                const board = getBoardByItemId(boards, itemId);
+                if (!board) {
+                    return old;
+                }
+                const column = board.columns.find(column => column.items.find(item => itemId === item.id));
+                if (!column) {
+                    throw new Error('Column not found')
+                }
+                const item = column.items.find(item => item.id === itemId);
+                if (item) {
+                    item.done = done
+                }
+                column.items = column.items.filter(el => el != item)
+                return {boards}
+            })
         },
         // update
         onSuccess: (data, variables) => {
-            variables.instance.done = data.setDone.done;
+            client.setQueryData(['boards'], {boards: data.setDone})
         }
     });
 }
