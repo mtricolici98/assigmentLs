@@ -5,10 +5,13 @@ type Query {
 type Mutation {
     moveItem(itemId: Int!, toListId: Int!, afterItemId: Int!, doneIncluded: Boolean!): [KanbanBoard!]!
     moveColumn(columnId: Int!, afterColumnId: Int!, doneIncluded: Boolean!): [KanbanBoard!]!
+    setDone(itemId: Int!, done: Boolean!): [KanbanBoard!]!
     createItem(title: String!, columnId: Int!): [KanbanBoard!]!
     updateItem(itemId: Int!, newTitle: String!): KanbanItem!
-    setDone(itemId: Int!, done: Boolean!): [KanbanBoard!]!
-    deleteItem(itemId: Int!): KanbanColumn
+    deleteItem(itemId: Int!): [KanbanBoard!]!
+    createColumn(title: String!, boardId: Int!): [KanbanBoard!]!
+    updateColumn(columnId: Int!, newTitle: String!): [KanbanBoard!]!
+    deleteColumn(columnId: Int!): [KanbanBoard!]!
 }
 
 type KanbanBoard {

@@ -9,6 +9,8 @@ import {getBoardByColumnId} from "../../utils/BoardUtils";
 import {useColumnBoardMutation, useItemBoardMutation} from "../../mutations/BoardMutations";
 import {GRAPHQL_SERVER} from "../../constants";
 import {KANBAN_QUERY} from "../../queries/BoardQueries";
+import {AddItemComponent} from "../reusables/AddItemComponent";
+import {useColumnAddMutation} from "../../mutations/ColumnMutations";
 
 
 export function Kanban() {
@@ -31,7 +33,7 @@ export function Kanban() {
         if (result.destination.index === result.source.index && result.source.droppableId === result.destination.droppableId) return;
         if (result.reason === 'CANCEL') return;
         if (result.type === 'item') {
-            const columnId = Number(result.destination.droppableId)
+            const columnId = Number(result.destination.droppableId.split('.')[1])
             let afterItemId = -1;
             const localData = client.getQueryData<KanbanQuery>(['boards']);
             if (result.destination.index > 0) {
@@ -84,11 +86,20 @@ export function Kanban() {
         }
 
     }, [])
+    const addColumnMutation = useColumnAddMutation(client);
+    const handleAddColumn = (boardId: number) => (newText: string) => {
+        addColumnMutation.mutate(
+            {
+                boardId,
+                title: newText
+            }
+        )
+    }
 
     return (
         <Box>
             {
-                data?.boards.map(
+                data?.boards?.map(
                     el => (
                         <DragDropContext onDragEnd={handleDragEnd}>
                             <Droppable droppableId={el.id.toString()} direction={'horizontal'} type={'column'}>
@@ -106,6 +117,8 @@ export function Kanban() {
                                             ))
                                         }
                                         {provided.placeholder}
+                                        <AddItemComponent label={"Add new column"}
+                                                          onTextChange={handleAddColumn(el.id)}/>
                                     </Stack>
                                 )}
                             </Droppable>

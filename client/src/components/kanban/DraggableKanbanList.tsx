@@ -1,10 +1,11 @@
 import {Draggable, Droppable} from "react-beautiful-dnd";
 import {KanbanList} from "./KanbanList";
-import {Button, Stack} from "@mui/material";
+import {Box, Button, Stack} from "@mui/material";
 import {DraggableKanbanItem} from "./DraggableKanbanItem";
 import {AddItemComponent} from "../reusables/AddItemComponent";
 import {useItemAddMutations} from "../../mutations/ItemMutations";
 import {useQueryClient} from "@tanstack/react-query";
+import React from "react";
 
 export function DraggableKanbanList({
                                         index,
@@ -33,20 +34,23 @@ export function DraggableKanbanList({
         {(provided) => (
             <KanbanList
                 title={title}
+                listId={id}
                 {...provided.draggableProps} {...provided.dragHandleProps}
                 ref={provided.innerRef}>
-                <Droppable droppableId={id.toString()}
+                <Droppable droppableId={'list.' + id.toString()}
                            direction={'vertical'} type={'item'}>
                     {(provided) => (
-                        <Stack spacing={2} ref={provided.innerRef}
-                               {...provided.droppableProps}>
-                            {
-                                items.map((item, index) => (
-                                    <DraggableKanbanItem key={item.id} item={item} index={index}/>
-                                ))
-                            }
-                            {provided.placeholder}
-                        </Stack>
+                        <div>
+                            <Stack spacing={2} ref={provided.innerRef}
+                                   {...provided.droppableProps}>
+                                {
+                                    items.map((item, index) => (
+                                        <DraggableKanbanItem key={item.id} item={item} index={index}/>
+                                    ))
+                                }
+                                {provided.placeholder}
+                            </Stack>
+                        </div>
                     )}
                 </Droppable>
                 <AddItemComponent label={'Add Item'} onTextChange={onItemConfirmed}/>

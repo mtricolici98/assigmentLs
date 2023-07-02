@@ -7,6 +7,7 @@ import boardQueries from "./controllers/board-queries";
 import itemMutations from "./controllers/item-mutations";
 import itemUpdates from "./controllers/item-updates";
 import columnsMutations from "./controllers/column-mutations";
+import columnUpdates from "./controllers/column-updates";
 
 const schema = buildSchema(readFileSync('./schema.graphql', 'utf-8'))
 
@@ -14,7 +15,8 @@ const root = {
     ...boardQueries,
     ...itemMutations,
     ...itemUpdates,
-    ...columnsMutations
+    ...columnsMutations,
+    ...columnUpdates
 }
 
 const app = express()

@@ -69,6 +69,21 @@ export const MUTATE_DELETE_ITEM = graphql(/* GraphQL */`
     mutation DeleteItem($itemId: Int!) {
         deleteItem(itemId: $itemId) {
             id
+            columnsOrder
+            columns {
+                id
+                name
+                itemsOrder
+                items {
+                    id
+                    title
+                    done
+                    images {
+                        id
+                        base64data
+                    }
+                }
+            }
         }
     }
 `)

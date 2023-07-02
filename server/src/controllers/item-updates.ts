@@ -82,7 +82,7 @@ class ItemUpdates {
                 where: {id: itemId}
             }
         )
-        return toDelete.column
+        return BoardQueries.boards({includeDone: false})
     }
 
     static async addImage({itemId, imageData}: { itemId: number, imageData: string }) {

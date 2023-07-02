@@ -5,7 +5,7 @@ export function DraggableKanbanItem({
                                         index,
                                         item
                                     }: {
-    item: { id: number; title: string; done: boolean, images?: any[] | null},
+    item: { id: number; title: string; done: boolean, images?: any[] | null },
     index: number
 }) {
     return <Draggable draggableId={"item." + item.id.toString()}
