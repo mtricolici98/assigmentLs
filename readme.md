@@ -14,7 +14,6 @@
 * Image Add
 * Image View
 
-
 ## Known bugs
 
 * Sometimes view doesn't rerender when setting done or deleting an item

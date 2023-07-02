@@ -9,6 +9,7 @@ type Mutation {
     createItem(title: String!, columnId: Int!): [KanbanBoard!]!
     updateItem(itemId: Int!, newTitle: String!): KanbanItem!
     deleteItem(itemId: Int!): [KanbanBoard!]!
+    addImage(itemId: Int!, imageSrc: String!): [KanbanBoard!]!
     createColumn(title: String!, boardId: Int!): [KanbanBoard!]!
     updateColumn(columnId: Int!, newTitle: String!): [KanbanBoard!]!
     deleteColumn(columnId: Int!): [KanbanBoard!]!
