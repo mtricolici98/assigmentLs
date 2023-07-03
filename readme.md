@@ -1,6 +1,39 @@
 # Changelog
 
-## Done
+# Running the demo
+
+## Server
+
+Run the container for the PG Instance:
+
+```
+cd server
+docker compose up -d
+```
+
+Install dependencies for the server
+
+```
+npm install
+```
+
+Note: `--force` may be needed
+
+Run `npx prisma generate` and `npx prisma migrate dev`
+
+Running `npx prisma seed` may be necessary
+
+Run `npm start` to start the server
+
+## Client
+
+`cd` to the client and init yarn using `yarn` or `npx yarn` command
+
+use `yarn start` or `npx yarn start` to start the development server
+
+# Summary
+
+## What was Done
 
 * Implemented drag and drop for both items and columns
 * Implemented item update
