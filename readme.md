@@ -47,6 +47,10 @@ use `yarn start` or `npx yarn start` to start the development server
 ## Known bugs
 
 * Sometimes view doesn't rerender properly...
+  * Example during column rename, item set to done or item deleted
+* Large images don't upload
+* Missing visibility on errors (all fails are silent)
+  * Would fix by adding a notification pop-up somewhere in the corner
 
 ## What would I add...
 
