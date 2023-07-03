@@ -2,7 +2,13 @@ import {QueryClient, useMutation} from "@tanstack/react-query";
 import {GRAPHQL_SERVER} from "../constants";
 import {KanbanItem, KanbanQuery} from "../gql/graphql";
 import {getBoardByColumnId, getBoardByItemId} from "../utils/BoardUtils";
-import {MUTATE_ADD_ITEM, MUTATE_DELETE_ITEM, MUTATE_DONE_ITEM, MUTATE_UPDATE_ITEM} from "../queries/ItemQueries";
+import {
+    MUTATE_ADD_IMAGE_TO_ITEM,
+    MUTATE_ADD_ITEM,
+    MUTATE_DELETE_ITEM,
+    MUTATE_DONE_ITEM,
+    MUTATE_UPDATE_ITEM
+} from "../queries/ItemQueries";
 import request from "graphql-request";
 
 
@@ -130,6 +136,24 @@ export function useItemAddMutations(client: QueryClient) {
         // update
         onSuccess: (data, variables) => {
             client.setQueryData(['boards'], {boards: data.createItem})
+        }
+    });
+}
+
+export function useItemAddImageMutations(client: QueryClient) {
+    return useMutation({
+        mutationFn: async (variables: {
+            imgSrc: string,
+            itemId: number
+        }) =>
+            request(
+                GRAPHQL_SERVER,
+                MUTATE_ADD_IMAGE_TO_ITEM,
+                variables,
+            ),
+        // update
+        onSuccess: (data, variables) => {
+            client.setQueryData(['boards'], {boards: data.addImage})
         }
     });
 }

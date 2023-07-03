@@ -55,6 +55,21 @@ export const MUTATE_DELETE_COLUMN = graphql(/* GraphQL */`
     mutation DeleteColumn($columnId: Int!) {
         deleteColumn(columnId: $columnId) {
             id
+            columnsOrder
+            columns {
+                id
+                name
+                itemsOrder
+                items {
+                    id
+                    title
+                    done
+                    images {
+                        id
+                        base64data
+                    }
+                }
+            }
         }
     }
 `)

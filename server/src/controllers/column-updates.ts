@@ -1,6 +1,4 @@
 import prisma from "../db";
-import ItemMutations from "./item-mutations";
-import boardQueries from "./board-queries";
 import BoardQueries from "./board-queries";
 
 class ColumnUpdates {
@@ -33,7 +31,7 @@ class ColumnUpdates {
 
 
     static async updateColumn({columnId, newTitle}: { columnId: number, newTitle: string }) {
-        const item = await prisma.column.update(
+         await prisma.column.update(
             {
                 where: {
                     id: columnId,
@@ -46,7 +44,7 @@ class ColumnUpdates {
                 }
             }
         )
-        return item
+        return BoardQueries.boards({includeDone: false})
     }
 
     static async deleteColumn({columnId}: { columnId: number }) {
@@ -61,11 +59,18 @@ class ColumnUpdates {
         if (!toDelete) {
             return;
         }
-        await prisma.item.delete(
+        await prisma.item.deleteMany(
             {
-                where: {id: columnId}
+                where: {
+                    column: {id: columnId}
+                },
             }
         )
+        await prisma.column.delete({
+            where: {
+                id: toDelete.id
+            }
+        })
         return toDelete.board
     }
 

@@ -1,6 +1,4 @@
 import prisma from "../db";
-import ItemMutations from "./item-mutations";
-import boardQueries from "./board-queries";
 import BoardQueries from "./board-queries";
 
 class ItemUpdates {
@@ -32,7 +30,7 @@ class ItemUpdates {
 
 
     static async updateItem({itemId, newTitle}: { itemId: number, newTitle: string }) {
-        const item = await prisma.item.update(
+        return await prisma.item.update(
             {
                 where: {
                     id: itemId,
@@ -45,7 +43,6 @@ class ItemUpdates {
                 }
             }
         )
-        return item
     }
 
     static async setDone({itemId, done}: { itemId: number, done: boolean }) {
@@ -85,8 +82,20 @@ class ItemUpdates {
         return BoardQueries.boards({includeDone: false})
     }
 
-    static async addImage({itemId, imageData}: { itemId: number, imageData: string }) {
-        // TODO: Implement
+    static async addImage({itemId, imageSrc}: { itemId: number, imageSrc: string }) {
+        await prisma.image.create(
+            {
+                data: {
+                    base64data: imageSrc,
+                    item: {
+                        connect: {
+                            id: itemId
+                        }
+                    }
+                },
+            }
+        )
+        return BoardQueries.boards({includeDone: false})
     }
 
 }
@@ -95,7 +104,8 @@ const itemUpdates = {
     createItem: ItemUpdates.createItem,
     updateItem: ItemUpdates.updateItem,
     setDone: ItemUpdates.setDone,
-    deleteItem: ItemUpdates.deleteItem
+    deleteItem: ItemUpdates.deleteItem,
+    addImage: ItemUpdates.addImage,
 }
 
 
